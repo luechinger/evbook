@@ -13,7 +13,7 @@ import {
   YAxis,
   type MouseHandlerDataParam,
 } from "recharts";
-import { paddedBounds, roundedDomain, sharedIntervals, ticksFor } from "@/lib/axis";
+import { AXIS_WIDTH, axisWidth, paddedBounds, roundedDomain, sharedIntervals, ticksFor } from "@/lib/axis";
 import { trendLine } from "@/lib/smooth";
 
 export interface Series {
@@ -277,6 +277,7 @@ export function SeriesChart({
   const yAxisProps = (side: "left" | "right") => {
     const own = bounds[side];
     const domain = own ? roundedDomain(own, intervals) : undefined;
+    const ticks = domain ? ticksFor(domain, intervals) : undefined;
     // The axis wears its series' color only while everything it measures wears
     // that color too — one series, or a pair drawn as one (the pack modules). A
     // side shared by differently-colored series belongs to their unit, not to
@@ -293,8 +294,9 @@ export function SeriesChart({
       // a scale and its line. A muted one is just another rule beside the grid.
       axisLine: color != null,
       tickLine: false,
-      width: 52,
-      ...(domain ? { domain, ticks: ticksFor(domain, intervals) } : {}),
+      // Wide enough for the longest tick: a six-digit odometer lost its first digit.
+      width: ticks ? axisWidth(ticks) : AXIS_WIDTH,
+      ...(domain ? { domain, ticks } : {}),
     } as const;
   };
 

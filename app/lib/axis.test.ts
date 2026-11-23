@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { paddedBounds, roundedDomain, sharedIntervals, ticksFor } from "./axis";
+import { AXIS_WIDTH, axisWidth, paddedBounds, roundedDomain, sharedIntervals, ticksFor } from "./axis";
 
 /**
  * The scales the charts are read against. Every case here is a real one from a
@@ -90,5 +90,19 @@ describe("sharedIntervals", () => {
     const range = paddedBounds([137.42, 388.13], NON_NEGATIVE)!;
     const intervals = sharedIntervals([energy, range]);
     expect(roundedDomain(energy, intervals)).toEqual([0, 50]);
+  });
+});
+
+describe("axisWidth", () => {
+  it("keeps the default width for ticks of up to five characters", () => {
+    expect(axisWidth([0, 25, 50, 75, 100])).toBe(AXIS_WIDTH);
+    expect(axisWidth([97500, 98000, 98500])).toBe(AXIS_WIDTH);
+    expect(axisWidth([-1500, -12.5])).toBe(AXIS_WIDTH);
+    expect(axisWidth([])).toBe(AXIS_WIDTH);
+  });
+
+  it("grows by a character's width for every character past five", () => {
+    expect(axisWidth([118500, 119000, 119500, 120000, 120500])).toBe(AXIS_WIDTH + 7);
+    expect(axisWidth([999500, 1000000])).toBe(AXIS_WIDTH + 14);
   });
 });
