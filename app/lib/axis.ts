@@ -83,3 +83,20 @@ export function sharedIntervals(bounds: [number, number][]): number {
   }
   return best;
 }
+
+/** The width a y-axis gets by default, which fits a tick of five characters. */
+export const AXIS_WIDTH = 52;
+const FITTING_CHARACTERS = 5;
+/** A digit at the axis's 11px, rounded up, so a wide one (0, 2, 5) still fits. */
+const CHARACTER_WIDTH = 7;
+
+/**
+ * How wide a y-axis must be for its longest tick. A fixed width cut the leading
+ * digit off a six-digit odometer (120500 read as 20500), so an axis grows by a
+ * character's width for every character past five. Shorter ticks keep the
+ * default, so the charts that always fitted do not move.
+ */
+export function axisWidth(ticks: number[]): number {
+  const longest = Math.max(0, ...ticks.map((tick) => String(tick).length));
+  return AXIS_WIDTH + Math.max(0, longest - FITTING_CHARACTERS) * CHARACTER_WIDTH;
+}
